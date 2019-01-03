@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLog;
     private ProgressBar mProgressBar;
     ExecutorService mExecutor;
-
+    MyTask myTask;
+    private boolean mTaskRunning;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +55,17 @@ public class MainActivity extends AppCompatActivity {
         //synchronously within background class
         //all aysnc task have hone worker thread or in other words android uses just one thread
         //for all asyncTasks
-        MyTask myTask = new MyTask();
-        myTask.execute("Red", "Green", "Blue");
+
+
+        //makeing sure asynctask object exists and running to cancled
+        if(mTaskRunning && myTask != null){
+            myTask.cancel(true);
+            mTaskRunning = false;
+        }else{
+            myTask = new MyTask();
+            myTask.execute("Red", "Green", "Blue");
+            mTaskRunning = true;
+        }
     }
 
     //  Clear the output, called from the onClick event in the layout file
@@ -94,6 +104,10 @@ public class MainActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             for (String value :
                     strings) {
+                if(isCancelled()){
+                    //when task is cancelled other methods do not gets run insted of onCancelled
+                    break;
+                }
                 Log.i(TAG, "doInBackground: " + value);
                 publishProgress(value);
                 try {
@@ -111,10 +125,15 @@ public class MainActivity extends AppCompatActivity {
         protected void onProgressUpdate(String... values) {
             log(values[0]);
         }
-        //we can only return single value after finishing job
+        //we can only return single value after finishing job - has access to mainUiThread
         @Override
         protected void onPostExecute(String s) {
             log(s);
+        }
+
+        @Override
+        protected void onCancelled() {
+            log("task cancelled");
         }
     }
 }
