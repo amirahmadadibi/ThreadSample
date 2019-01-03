@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         //all aysnc task have hone worker thread or in other words android uses just one thread
         //for all asyncTasks
         MyTask myTask = new MyTask();
-        myTask.execute("Red","Green","Blue");
+        myTask.execute("Red", "Green", "Blue");
     }
 
     //  Clear the output, called from the onClick event in the layout file
@@ -95,13 +95,26 @@ public class MainActivity extends AppCompatActivity {
             for (String value :
                     strings) {
                 Log.i(TAG, "doInBackground: " + value);
+                publishProgress(value);
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            return null;
+
+            //return finished data to onPostExecute Method
+            return "it's finished";
+        }
+        //onProgress is touch with publishProgress method and has access to mainUiThread
+        @Override
+        protected void onProgressUpdate(String... values) {
+            log(values[0]);
+        }
+        //we can only return single value after finishing job
+        @Override
+        protected void onPostExecute(String s) {
+            log(s);
         }
     }
 }
