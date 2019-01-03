@@ -1,5 +1,6 @@
 package com.example.android.concurrency;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView mLog;
     private ProgressBar mProgressBar;
     ExecutorService mExecutor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,11 +50,12 @@ public class MainActivity extends AppCompatActivity {
 
     //Run some code called from the onClick event in the layout file
     public void runCode(View v) {
-        for (int i = 0; i < 10; i++) {
-            Runnable worker = new BackgroundTask(i);
-            mExecutor.execute(worker);
-        }
-        Log.i(TAG, "-----------------------------------------------------------");
+        //now I'm running 3 background task at a time sequentially and
+        //synchronously within background class
+        //all aysnc task have hone worker thread or in other words android uses just one thread
+        //for all asyncTasks
+        MyTask myTask = new MyTask();
+        myTask.execute("Red","Green","Blue");
     }
 
     //  Clear the output, called from the onClick event in the layout file
@@ -83,6 +86,22 @@ public class MainActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.VISIBLE);
         } else {
             mProgressBar.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    class MyTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String value :
+                    strings) {
+                Log.i(TAG, "doInBackground: " + value);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
         }
     }
 }
