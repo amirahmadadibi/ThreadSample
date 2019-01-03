@@ -11,6 +11,9 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private ScrollView mScroll;
     private TextView mLog;
     private ProgressBar mProgressBar;
-
+    ExecutorService mExecutor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,44 +36,23 @@ public class MainActivity extends AppCompatActivity {
         mProgressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         mLog.setText(R.string.lorem_ipsum);
-        //Looper.getMainLooper -> gets main thread looper
-        mHandler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(Message msg) {
-                //when ever handler receive a message
-                Bundle bundle = msg.getData();
-                String message = bundle.getString(MESSAGE_KEY);
-                log(message);
-                displayProgressBar(false);
-            }
-        };
+        //I want to create a pool of 5 threads
+        mExecutor = Executors.newFixedThreadPool(5);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mExecutor.shutdown();
     }
 
     //Run some code called from the onClick event in the layout file
     public void runCode(View v) {
-        log("Running code");
-        displayProgressBar(true);
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                Log.i(TAG, "run: starting thread for 4 seconds");
-                try {
-                    Thread.sleep(4000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                //create that message I want to pass to handler to MainThread
-                Message message = new Message();
-                Bundle bundle = new Bundle();
-                bundle.putString(MESSAGE_KEY,"thread is compelete!");
-                message.setData(bundle);
-                mHandler.sendMessage(message);
-            }
-        };
-//        Handler handler = new Handler();
-//        handler.postDelayed(runnable, 3000);
-        Thread thread = new Thread(runnable);
-        thread.start();
+        for (int i = 0; i < 10; i++) {
+            Runnable worker = new BackgroundTask(i);
+            mExecutor.execute(worker);
+        }
+        Log.i(TAG, "-----------------------------------------------------------");
     }
 
     //  Clear the output, called from the onClick event in the layout file
