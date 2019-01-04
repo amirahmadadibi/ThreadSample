@@ -12,6 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.example.android.concurrency.services.MyIntentService;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,21 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Run some code called from the onClick event in the layout file
     public void runCode(View v) {
-        //now I'm running 3 background task at a time sequentially and
-        //synchronously within background class
-        //all aysnc task have hone worker thread or in other words android uses just one thread
-        //for all asyncTasks
-
-
-        //makeing sure asynctask object exists and running to cancled
-        if(mTaskRunning && myTask != null){
-            myTask.cancel(true);
-            mTaskRunning = false;
-        }else{
-            myTask = new MyTask();
-            myTask.execute("Red", "Green", "Blue");
-            mTaskRunning = true;
-        }
+        MyIntentService.startActionFoo(this,"value1","value2");
     }
 
     //  Clear the output, called from the onClick event in the layout file
