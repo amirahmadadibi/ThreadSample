@@ -3,6 +3,7 @@ package com.example.android.concurrency.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 /**
@@ -12,6 +13,7 @@ import android.util.Log;
  * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
+//there is ony one thread for all intent services
 public class MyIntentService extends IntentService {
     // TODO: Rename actions, choose action names that describe tasks that this
     // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
@@ -19,6 +21,8 @@ public class MyIntentService extends IntentService {
     // TODO: Rename parameters
     private static final String EXTRA_PARAM1 = "com.example.android.concurrency.services.extra.PARAM1";
     private static final String EXTRA_PARAM2 = "com.example.android.concurrency.services.extra.PARAM2";
+    public static final String SERVICE_MESSAGE = "ServiceMessage";
+    public static final String MEESSAGE_KEY = "meessage";
 
 
     @Override
@@ -66,7 +70,7 @@ public class MyIntentService extends IntentService {
      * parameters.
      */
     private void handleActionFoo(String param1, String param2) {
-        Log.i("CodeRunner", "handleActionFoo : all done!");
+        sendMessage("CodeRunner handleActionFoo : all done!");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -78,5 +82,13 @@ public class MyIntentService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.d("CodeRunner", "onDestroy: ");
+    }
+
+    //send broadcast to entire application process
+    private void sendMessage(String message) {
+        Intent intent = new Intent(SERVICE_MESSAGE);
+        intent.putExtra(MEESSAGE_KEY, message);
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(intent);
     }
 }

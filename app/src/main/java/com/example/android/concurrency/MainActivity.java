@@ -1,10 +1,15 @@
 package com.example.android.concurrency;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +35,22 @@ public class MainActivity extends AppCompatActivity {
     ExecutorService mExecutor;
     MyTask myTask;
     private boolean mTaskRunning;
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra(MESSAGE_KEY);
+            log(message);
+        }
+    };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //register receiver
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .registerReceiver(broadcastReceiver,new IntentFilter(MyIntentService.SERVICE_MESSAGE));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,11 +66,7 @@ public class MainActivity extends AppCompatActivity {
         mExecutor = Executors.newFixedThreadPool(5);
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mExecutor.shutdown();
-    }
+
 
     //Run some code called from the onClick event in the layout file
     public void runCode(View v) {
@@ -132,4 +149,13 @@ public class MainActivity extends AppCompatActivity {
             log("Cancelled With Result " + s);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mExecutor.shutdown();
+        //deregister broadcast receiver
+        LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
+    }
+
 }
