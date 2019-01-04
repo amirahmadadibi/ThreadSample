@@ -35,16 +35,18 @@ public class MyService extends Service {
         return super.onUnbind(intent);
     }
 
-    //a class that extends Binder
-    class ServiceBinder extends Binder{
-        MyService getService(){
-            return MyService.this;
-        }
-    }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i(TAG, "onDestroy: bound service");
+    }
+
+
+    //a class that extends Binder
+    public class ServiceBinder extends Binder{
+        public MyService getService(){
+            return MyService.this;
+        }
     }
 }
