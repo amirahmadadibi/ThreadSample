@@ -38,8 +38,12 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra(MESSAGE_KEY);
-            log(message);
+            if(intent.getStringExtra(MESSAGE_KEY) != null){
+                Log.i(TAG, "onReceive: ");
+                String message = intent.getStringExtra(MESSAGE_KEY);
+                log(message);
+            }
+
         }
     };
 
@@ -128,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
         //onProgress is touch with publishProgress method and runs on mainUiThread
         @Override
-        protected void onProgressUpdate(String... values) {
+        protected void   onProgressUpdate(String... values) {
             log(values[0]);
         }
         //we can only return single value after finishing job - runs on mainUiThread

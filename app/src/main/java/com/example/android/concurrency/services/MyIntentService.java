@@ -23,6 +23,7 @@ public class MyIntentService extends IntentService {
     private static final String EXTRA_PARAM2 = "com.example.android.concurrency.services.extra.PARAM2";
     public static final String SERVICE_MESSAGE = "ServiceMessage";
     public static final String MEESSAGE_KEY = "meessage";
+    public static final String TAG = "CodeRunner";
 
 
     @Override
@@ -60,6 +61,7 @@ public class MyIntentService extends IntentService {
             if (ACTION_FOO.equals(action)) {
                 final String param1 = intent.getStringExtra(EXTRA_PARAM1);
                 final String param2 = intent.getStringExtra(EXTRA_PARAM2);
+                Log.i(TAG, "onHandleIntent: ");
                 handleActionFoo(param1, param2);
             }
         }
@@ -71,11 +73,7 @@ public class MyIntentService extends IntentService {
      */
     private void handleActionFoo(String param1, String param2) {
         sendMessage("CodeRunner handleActionFoo : all done!");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Log.i(TAG, "handleActionFoo: ");
     }
 
     @Override
