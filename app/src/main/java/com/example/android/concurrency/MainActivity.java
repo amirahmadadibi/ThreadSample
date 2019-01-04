@@ -98,7 +98,8 @@ public class MainActivity extends AppCompatActivity {
             mProgressBar.setVisibility(View.INVISIBLE);
         }
     }
-
+    //it's best used for task that hva one or two seconds live period
+    //AsyncTask is sensitive when it's time to configuration changes
     class MyTask extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... strings) {
@@ -120,20 +121,27 @@ public class MainActivity extends AppCompatActivity {
             //return finished data to onPostExecute Method
             return "it's finished";
         }
-        //onProgress is touch with publishProgress method and has access to mainUiThread
+        //onProgress is touch with publishProgress method and runs on mainUiThread
         @Override
         protected void onProgressUpdate(String... values) {
             log(values[0]);
         }
-        //we can only return single value after finishing job - has access to mainUiThread
+        //we can only return single value after finishing job - runs on mainUiThread
         @Override
         protected void onPostExecute(String s) {
             log(s);
         }
-
+        //- runs on mainUiThread
         @Override
         protected void onCancelled() {
             log("task cancelled");
+        }
+        //if we return vlue form doInBackground and We use this type of OnCancelled,
+        //this version of onCancelled get's used
+         //- runs on mainUiThread
+        @Override
+        protected void onCancelled(String s) {
+            log("Cancelled With Result " + s);
         }
     }
 }
